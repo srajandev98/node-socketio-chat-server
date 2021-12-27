@@ -33,7 +33,8 @@ class SpaceService {
 
     async getSpace(req) {
         try {
-            return;
+            const resObj = await this.spaceModel.findRecords({});
+            return resObj;
         } catch (err) {
             logger.error('Error Getting Space: %o', err);
         }
@@ -41,7 +42,9 @@ class SpaceService {
 
     async getSpaceBySpaceId(req) {
         try {
-            return;
+            const spaceId = req.params.spaceId;
+            const resObj = await this.spaceModel.findRecordById(spaceId);
+            return resObj;
         } catch (err) {
             logger.error('Error Getting Space by Space Id: %o', err);
         }

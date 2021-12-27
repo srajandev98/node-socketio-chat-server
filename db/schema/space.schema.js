@@ -7,18 +7,22 @@ const SpaceSchema = new Schema(
             type: Schema.Types.ObjectId,
             required: true
         },
-        superUserId: {
+        adminId: {
             type: Schema.Types.ObjectId,
             required: true
         },
-        userId: {
-            type: Schema.Types.ObjectId,
-            required: true
-        },
-        socketId: {
-            type: String,
-            required: true
-        }
+        users: [
+            {
+                userId: {
+                    type: Schema.Types.ObjectId,
+                    required: true
+                },
+                socketId: {
+                    type: String,
+                    required: true
+                }
+            }
+        ]
     },
     { timestamps: true }
 );

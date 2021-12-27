@@ -1,6 +1,6 @@
 const { logger } = require('./config/logModule');
 const SocketEvents = require('./helpers/socketEvents');
-const SocketIOActions = require('./actions/socketio');
+const SocketIOActions = require('./events/SocketIO');
 
 class WebSocketServer {
     constructor(userTypings = {}) {
@@ -17,7 +17,7 @@ class WebSocketServer {
 
             /** Socket Events */
             socket.on('disconnect', async () => {
-                logger.info('User Disconnected');
+                logger.info('User Disconnected!');
 
                 if (currentSpaceId) {
                     /** Filter through users and remove user from user list in that space */
