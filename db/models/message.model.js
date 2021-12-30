@@ -1,4 +1,4 @@
-const { _MessageModel } = require('../schema/message.schema');
+const { _Message } = require('../schema/message.schema');
 
 class MessageModel {
 
@@ -11,7 +11,8 @@ class MessageModel {
      */
     async createRecord(dataObject) {
         try {
-            const messageRecord = await _MessageModel.create(dataObject).populate('user');
+            console.log(dataObject);
+            const messageRecord = await _Message.create(dataObject);
             return messageRecord;
         } catch(error) {
             throw { error, message: 'Error Creating Message' };
@@ -25,7 +26,7 @@ class MessageModel {
      */
     async findRecord(condition) {
         try {
-            const messageRecord = await _MessageModel.findOne(condition).populate('user');
+            const messageRecord = await _Message.findOne(condition);
             return messageRecord;
         } catch(error) {
             throw { error, message: 'Error Finding Message' };
@@ -39,7 +40,7 @@ class MessageModel {
      */
      async findRecords(condition) {
         try {
-            const messageRecord = await _MessageModel.find(condition).populate('user');
+            const messageRecord = await _Message.find(condition);
             return messageRecord;
         } catch(error) {
             throw { error, message: 'Error Finding Messages' };
@@ -53,7 +54,7 @@ class MessageModel {
      */
      async findRecordById(_messageId) {
         try {
-            const messageRecord = await _MessageModel.findById(_messageId).populate('user');
+            const messageRecord = await _Message.findById(_messageId);
             return messageRecord;
         } catch(error) {
             throw { error, message: 'Error Finding Message By Id' };
@@ -67,7 +68,7 @@ class MessageModel {
      */
      async updateRecord(_id, data) {
         try {
-            const messageRecord = await _MessageModel.findByIdAndUpdate(_id, { ...data }, {new: true}).populate('user');
+            const messageRecord = await _Message.findByIdAndUpdate(_id, { ...data }, {new: true});
             return messageRecord;
         } catch(error) {
             throw { error, message: 'Error Updating Message' };
@@ -81,7 +82,7 @@ class MessageModel {
      */
     //  async deleteRecordById(_id) {
     //     try {
-    //         const messageRecord = await _MessageModel.findByIdAndDelete(_id);
+    //         const messageRecord = await _Message.findByIdAndDelete(_id);
     //         return messageRecord;
     //     } catch(error) {
     //         throw { error, message: 'Error Deleting Message' };

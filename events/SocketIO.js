@@ -13,13 +13,14 @@ class SocketIOActions {
         try {
             const message = {
                 content: data.content,
-                adminId: data.adminId,
                 userId: data.userId,
-                space: data.spaceId
+                space: data.space
             };
+            console.log(message, 'inside add message socket io');
             const messageRecord = await this.messageModel.createRecord(message);
             return messageRecord;
         } catch (err) {
+            console.log(err);
             logger.error('Failed to Add Message: %s', err);
         }
     }
@@ -30,7 +31,7 @@ class SocketIOActions {
             const messageRecords = await this.messageModel.findRecords({ space: spaceId });
             return messageRecords;
         } catch (err) {
-            logger.error('Failed to Add Message: %s', err);
+            logger.error('Failed to Get Messages: %s', err);
         }
     }
 
@@ -67,17 +68,14 @@ class SocketIOActions {
             if (space) {
                 if (
                     space.users &&
-                    !space.users.find(user => user.lookup._id.toString() === data.user._id)
+                    !space.users.find(user => user._id.toString() === data.user._id)
                 ) {
                     space.users.push({
-                        lookup: mongoose.Types.ObjectId(data.user._id),
+                        userId: mongoose.Types.ObjectId(data.user._id),
                         socketId: data.socketId
                     });
-                    const updatedRoom = await space.save();
-                    return await Space.populate(updatedRoom, {
-                        path: 'user users.lookup',
-                        select: 'username social image handle'
-                    });
+                    const updatedSpace = await space.save();
+                    return await updatedSpace;
                 } else {
                     // Update user socket id if the user already exists
                     const existingUser = space.users.find(
@@ -97,6 +95,7 @@ class SocketIOActions {
             }
         } catch (err) {
             logger.error('Failed to Update Space Users %s', err);
+            console.log(err);
         }
     }
 

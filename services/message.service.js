@@ -8,6 +8,7 @@ class MessageService {
 
     async createMessage(req) {
         try {
+            console.log(req.data);
             if (!req.body.content) {
                 errors.push({
                     param: 'no_content',
@@ -20,9 +21,8 @@ class MessageService {
 
             const message = {
                 content: req.body.content,
-                admin: req.body.admin ? true : false,
-                user: req.user.id,
-                room: req.body.roomId
+                userId: req.body.userId,
+                space: req.body.space._id
             };
 
             const resObj = await this.messageModel.createRecord(message);

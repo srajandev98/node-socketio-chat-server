@@ -3,12 +3,6 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema(
     {
-        id: {
-            type: String,
-            required: true,
-            trim: true,
-            unique: true
-        },
         content: {
             type: String,
             required: true,
@@ -22,10 +16,6 @@ const MessageSchema = new Schema(
         userId: {
             type: Schema.Types.ObjectId,
             required: true
-        },
-        admin: {
-            type: Boolean,
-            default: false
         }
     },
     { timestamps: true }

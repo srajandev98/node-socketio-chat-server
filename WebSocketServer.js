@@ -5,14 +5,13 @@ const SocketIOActions = require('./events/SocketIO');
 class WebSocketServer {
     constructor(userTypings = {}) {
         this.userTypings = userTypings;
-        this.socketEvents = SocketEvents;
-        this.socketIOActions = SocketIOActions;
+        this.socketEvents = new SocketEvents();
+        this.socketIOActions = new SocketIOActions();
     }
 
     init(io) {
         io.on('connection', socket => {
-            logger.info('User Connected!', socket.id);
-            console.log(socket.id);
+            logger.info('User Connected', socket.id);
             let currentSpaceId = null;
 
             /** Socket Events */
@@ -25,6 +24,8 @@ class WebSocketServer {
                         spaceId: currentSpaceId,
                         socketId: socket.id
                     });
+
+                    console.log(currentSpaceId, spaceState);
 
                     socket.broadcast.to(currentSpaceId).emit(
                         'updateUserList',
@@ -101,23 +102,24 @@ class WebSocketServer {
 
             /** User Typing Events */
             socket.on('userTyping', data => {
-                if (!userTypings[data.space._id]) {
-                    userTypings[data.space._id] = [];
+                console.log('typing');
+                if (!this.userTypings[data.space._id]) {
+                    this.userTypings[data.space._id] = [];
                 } else {
-                    if (!userTypings[data.space._id].includes(data.user.handle)) {
-                        userTypings[data.space._id].push(data.user.handle);
+                    if (!this.userTypings[data.space._id].includes(data.user.handle)) {
+                        this.userTypings[data.space._id].push(data.user.handle);
                     }
                 }
 
                 socket.broadcast
                     .to(data.space._id)
-                    .emit('receivedUserTyping', JSON.stringify(userTypings[data.space._id]));
+                    .emit('receivedUserTyping', JSON.stringify(this.userTypings[data.space._id]));
             });
 
             socket.on('removeUserTyping', data => {
-                if (userTypings[data.space._id]) {
-                    if (userTypings[data.space._id].includes(data.user.handle)) {
-                        userTypings[data.space._id] = userTypings[data.space._id].filter(
+                if (this.userTypings[data.space._id]) {
+                    if (this.userTypings[data.space._id].includes(data.user.handle)) {
+                        this.userTypings[data.space._id] = this.userTypings[data.space._id].filter(
                             handle => handle !== data.user.handle
                         );
                     }
@@ -125,13 +127,15 @@ class WebSocketServer {
 
                 socket.broadcast
                     .to(data.space._id)
-                    .emit('receivedUserTyping', JSON.stringify(userTypings[data.space._id]));
+                    .emit('receivedUserTyping', JSON.stringify(this.userTypings[data.space._id]));
             });
 
             /** New Message Event */
             socket.on('newMessage', async data => {
+                console.log('newmessage event');
                 const newMessage = await this.socketIOActions.ADD_MESSAGE(data);
 
+                console.log(data.space._id);
                 // Emit data back to the client for display
                 io.to(data.space._id).emit('receivedNewMessage', JSON.stringify(newMessage));
             });
@@ -156,13 +160,15 @@ class WebSocketServer {
 
             /** Reconnected: Update Reconnected User in Space */
             socket.on('reconnectUser', data => {
-                currentSpaceId = data.space._id;
-                data.socketId = socket.id;
-                if (socket.request.headers.referer.split('/').includes('space')) {
-                    socket.join(currentSpaceId, async () => {
-                        socket.emit('reconnected');
-                        await this.socketIOActions.UPDATE_SPACE_USERS(data);
-                    });
+                if (data && data.space) {
+                    currentSpaceId = data.space._id;
+                    data.socketId = socket.id;
+                    if (socket.request.headers.referer.split('/').includes('space')) {
+                        socket.join(currentSpaceId, async () => {
+                            socket.emit('reconnected');
+                            await this.socketIOActions.UPDATE_SPACE_USERS(data);
+                        });
+                    }
                 }
             });
         });

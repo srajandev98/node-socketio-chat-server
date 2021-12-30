@@ -1,4 +1,4 @@
-const { _SpaceModel } = require('../schema/space.schema');
+const { _Space } = require('../schema/space.schema');
 
 class SpaceModel {
 
@@ -11,7 +11,7 @@ class SpaceModel {
      */
     async createRecord(dataObject) {
         try {
-            const spaceRecord = await _SpaceModel.create(dataObject).populate('user users.lookup');
+            const spaceRecord = await _Space.create(dataObject);
             return spaceRecord;
         } catch(error) {
             throw { error, space: 'Error Creating Message' };
@@ -25,7 +25,7 @@ class SpaceModel {
      */
     async findRecord(condition) {
         try {
-            const spaceRecord = await _SpaceModel.findOne(condition).populate('user users.lookup');
+            const spaceRecord = await _Space.findOne(condition);
             return spaceRecord;
         } catch(error) {
             throw { error, space: 'Error Finding Message' };
@@ -39,9 +39,10 @@ class SpaceModel {
      */
      async findRecords(condition) {
         try {
-            const spaceRecord = await _SpaceModel.find(condition).populate('user users.lookup');
+            const spaceRecord = await _Space.find(condition);
             return spaceRecord;
         } catch(error) {
+            console.log(error);
             throw { error, space: 'Error Finding Message' };
         }
     }
@@ -53,7 +54,7 @@ class SpaceModel {
      */
      async findRecordById(_spaceId) {
         try {
-            const spaceRecord = await _SpaceModel.findById(_spaceId).populate('user users.lookup');
+            const spaceRecord = await _Space.findById(_spaceId);
             return spaceRecord;
         } catch(error) {
             throw { error, space: 'Error Finding Message By Id' };
@@ -67,7 +68,7 @@ class SpaceModel {
      */
      async updateRecord(_id, data) {
         try {
-            const spaceRecord = await _SpaceModel.findByIdAndUpdate(_id, { ...data }, {new: true}).populate('user users.lookup');
+            const spaceRecord = await _Space.findByIdAndUpdate(_id, { ...data }, {new: true});
             return spaceRecord;
         } catch(error) {
             throw { error, space: 'Error Updating Message' };
@@ -81,7 +82,7 @@ class SpaceModel {
      */
     //  async deleteRecordById(_id) {
     //     try {
-    //         const spaceRecord = await _SpaceModel.findByIdAndDelete(_id);
+    //         const spaceRecord = await _Space.findByIdAndDelete(_id);
     //         return spaceRecord;
     //     } catch(error) {
     //         throw { error, space: 'Error Deleting Message' };

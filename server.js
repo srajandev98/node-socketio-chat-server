@@ -32,8 +32,8 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 /** Routes */
-const spaceRoutes = require('./routes/space');
-const messageRoutes = require('./routes/message');
+const spaceRoutes = require('./routes/space.route');
+const messageRoutes = require('./routes/message.route');
 
 /** Middleware */
 app.use(

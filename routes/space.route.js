@@ -8,11 +8,11 @@ const spaceService = new _SpaceService();
 const isAuth = require('../middleware/isAuth');
 
 /**
- * @description GET /api/space
+ * @description GET /api/space?adminId=61cb7750b2828f2ff8b0d9a8
  */
 router.get('/', isAuth, async (req, res) => {
     try {
-        const spaces = await spaceService.getSpace(req);
+        const spaces = await spaceService.getSpacesByAdminId(req);
         if (spaces) {
             return res.status(200).json({
                 data: spaces
@@ -54,7 +54,7 @@ router.get('/:spaceId', isAuth, async (req, res) => {
  */
 router.post('/', isAuth, async (req, res) => {
     try {
-        const space = await spaceService(req);
+        const space = await spaceService.createSpace(req);
         return res.status(200).json({
             data: space
         });

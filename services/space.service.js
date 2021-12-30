@@ -1,39 +1,56 @@
 const { logger } = require('../config/logModule');
 const SpaceModel = require('../db/models/space.model');
+const MessageModel = require('../db/models/message.model');
 
 class SpaceService {
     constructor() {
         this.spaceModel = new SpaceModel();
+        this.messageModel = new MessageModel();
+    }
+
+    async _fetchMessagesBySpaceId(spaceId) {
+        try {
+            const messages = await this.messageModel.findRecords({ space: spaceId });
+            return messages;
+        } catch (err) {
+            logger.error('Error Creating Space: %o', err);
+            return [];
+        }
     }
 
     async createSpace(req) {
         try {
-            const space = await this.spaceModel.findRecord({
+            // Check if there is space for adminId and userId
+            let space = await this.spaceModel.findRecord({
                 relationId: req.body.relationId,
                 adminId: req.body.adminId,
-                userId: req.body.userId
+                users: {
+                    $elemMatch: { userId: req.body.userId }
+                }
             });
 
-            if (space) {
-                throw new Error({ param: 'SPACE_TAKEN', msg: 'Space already taken' });
-            } else {
+            if (!space) {
                 const newSpace = {
                     relationId: req.body.relationId,
                     adminId: req.body.adminId,
-                    userId: req.body.userId
+                    users: [{ userId: req.body.userId }]
                 };
-
-                const resObj = await this.spaceModel.createRecord(newSpace);
-                return resObj;
+                space = await this.spaceModel.createRecord(newSpace);
             }
+
+            // space = JSON.parse(JSON.stringify(space));
+            // const messages = await this._fetchMessagesBySpaceId(space._id);
+            // space['messages'] = messages;
+            return space;
         } catch (err) {
             logger.error('Error Creating Space: %o', err);
         }
     }
 
-    async getSpace(req) {
+    async getSpacesByAdminId(req) {
         try {
-            const resObj = await this.spaceModel.findRecords({});
+            const adminId = req.params.adminId;
+            const resObj = await this.spaceModel.findRecords({ adminId });
             return resObj;
         } catch (err) {
             logger.error('Error Getting Space: %o', err);
@@ -44,6 +61,7 @@ class SpaceService {
         try {
             const spaceId = req.params.spaceId;
             const resObj = await this.spaceModel.findRecordById(spaceId);
+            resObj['messages'] = await this._fetchMessagesBySpaceId(spaceId);
             return resObj;
         } catch (err) {
             logger.error('Error Getting Space by Space Id: %o', err);

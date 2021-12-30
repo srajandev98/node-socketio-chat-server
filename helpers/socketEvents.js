@@ -2,7 +2,7 @@ const socketIOActions = require('../events/SocketIO');
 
 class SocketEvents {
     constructor() {
-        this.socketIOActions = socketIOActions;
+        this.socketIOActions = new socketIOActions();
     }
 
     JOIN_SPACE(socket, data) {
@@ -33,17 +33,16 @@ class SocketEvents {
             );
 
             /** Emit back the message */
-            socket.broadcast.to(data.space._id).emit(
-                'receivedNewMessage',
-                JSON.stringify(
-                    await this.socketIOActions.ADD_MESSAGE({
-                        space: data.space,
-                        user: false,
-                        content: data.content,
-                        admin: data.admin
-                    })
-                )
-            );
+            // socket.broadcast.to(data.space._id).emit(
+            //     'receivedNewMessage',
+            //     JSON.stringify(
+            //         await this.socketIOActions.ADD_MESSAGE({
+            //             space: data.space,
+            //             user: false,
+            //             content: data.content
+            //         })
+            //     )
+            // );
         });
     }
 }

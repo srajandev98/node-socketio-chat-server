@@ -18,11 +18,15 @@ const SpaceSchema = new Schema(
                     required: true
                 },
                 socketId: {
-                    type: String,
-                    required: true
+                    type: String
                 }
             }
-        ]
+        ],
+        status: {
+            type: String,
+            require: true,
+            default: 'active'
+        }
     },
     { timestamps: true }
 );
